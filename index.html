@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description"
+    content="Aether.AI - A highly aesthetic, production-ready browser-based AI Agent with real-time Speech-to-Text, Text-to-Speech, Barge-In, and dynamic mood shifting." />
+  <title>Dual Pulse | Autonomous Cyber-Agent</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet" />
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    // Custom tailwind configuration to match Cyberpunk styling
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+            orbitron: ['Orbitron', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'spin-slow': 'spin 12s linear infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Cyberpunk custom CSS variables with smooth transitions for mood shifts */
+    :root {
+      /* Indigo/Calm Theme Variables (Default) */
+      --accent-primary: #8b5cf6;
+      --accent-primary-rgb: 139, 92, 246;
+      --accent-glow: rgba(139, 92, 246, 0.4);
+      --bg-gradient-start: #080312;
+      --bg-gradient-end: #140827;
+      --mic-glow: 0 0 25px rgba(139, 92, 246, 0.6);
+      --glass-border: rgba(139, 92, 246, 0.2);
+    }
+
+    /* Transition variable changes smoothly */
+    body {
+      background: radial-gradient(circle at 10% 20%, rgba(var(--accent-primary-rgb), 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(var(--accent-primary-rgb), 0.08) 0%, transparent 45%),
+        linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
+      background-attachment: fixed;
+      transition: background 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* Custom Scrollbar styled for a clean UI */
+    @media (max-width: 768px) {
+      ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+
+      #chat-container::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(var(--accent-primary-rgb), 0.3);
+      border-radius: 9999px;
+      transition: background 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(var(--accent-primary-rgb), 0.6);
+    }
+
+    /* Cyberpunk Grid Overlay */
+    .cyber-grid {
+      background-size: 50px 50px;
+      background-image:
+        linear-gradient(to right, rgba(var(--accent-primary-rgb), 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(var(--accent-primary-rgb), 0.03) 1px, transparent 1px);
+      transition: background-image 1.2s ease;
+    }
+
+    /* Text Glow Effect */
+    .neon-text-glow {
+      text-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.6),
+        0 0 20px rgba(var(--accent-primary-rgb), 0.3);
+    }
+
+    /* Dynamic Glassmorphism styling */
+    .glass-panel {
+      background: rgba(10, 11, 22, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      transition: border-color 1.2s ease, box-shadow 1.2s ease;
+    }
+
+    .glass-input {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(var(--accent-primary-rgb), 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.3);
+      outline: none;
+    }
+
+    /* Pulsing mic glow when listening */
+    @keyframes micPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.4);
+        transform: scale(1);
+      }
+
+      50% {
+        box-shadow: 0 0 35px rgba(var(--accent-primary-rgb), 0.8),
+          0 0 50px rgba(var(--accent-primary-rgb), 0.4);
+        transform: scale(1.05);
+      }
+    }
+
+    .mic-active-glow {
+      animation: micPulse 1.6s infinite ease-in-out;
+    }
+
+    /* Custom CSS adjustments for Markdown inside chats */
+    .markdown-content {
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .markdown-content p {
+      margin-bottom: 0.75rem;
+      line-height: 1.625;
+      max-width: 100%;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .markdown-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .markdown-content code {
+      font-family: 'Fira Code', monospace;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .markdown-content pre {
+      background: rgba(8, 10, 20, 0.85) !important;
+      border: 1px solid rgba(var(--accent-primary-rgb), 0.2);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+      max-width: 100%;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .markdown-content pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: 0.85rem;
+    }
+
+    .markdown-content ul,
+    .markdown-content ol {
+      margin-left: 1.5rem;
+      margin-bottom: 0.75rem;
+      list-style-type: disc;
+    }
+
+    .markdown-content ol {
+      list-style-type: decimal;
+    }
+
+    .markdown-content a {
+      color: var(--accent-primary);
+      text-decoration: underline;
+      transition: opacity 0.2s ease;
+    }
+
+    .markdown-content a:hover {
+      opacity: 0.8;
+    }
+
+    /* Typing indicator cursor animation */
+    .typing-cursor::after {
+      content: '▋';
+      animation: blink 1s step-start infinite;
+      color: var(--accent-primary);
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* =====================================================
+       MOBILE RESPONSIVE ADDITIONS (no existing code changed)
+       ===================================================== */
+
+    /* Safe area insets for notched phones */
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    /* Allow body to scroll naturally on mobile */
+    @media (max-width: 768px) {
+      body {
+        overflow-y: auto !important;
+      }
+
+      #chat-container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+      }
+
+      #chat-container::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    #message-list>div {
+      scroll-snap-align: start;
+    }
+
+    /* Hide scrollbar for chat container globally */
+    #chat-container::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    #chat-container {
+      /* Ensure scroll snapping only on mobile */
+    }
+
+    @media (max-width: 768px) {
+      #chat-container {
+        scroll-snap-type: y mandatory;
+      }
+    }
+
+    @media (max-width: 640px) {
+      #settings-modal>div:last-of-type {
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        border-top-left-radius: 1rem !important;
+        border-top-right-radius: 1rem !important;
+        height: auto !important;
+        max-height: 92vh !important;
+        bottom: 0;
+        position: absolute;
+        left: 0;
+        right: 0;
+      }
+
+      #settings-modal {
+        align-items: flex-end !important;
+        justify-content: center !important;
+      }
+
+      /* Toast: keep above mobile keyboard */
+      #toast-container {
+        bottom: calc(80px + var(--safe-bottom)) !important;
+      }
+
+      /* Header: add safe-area padding */
+      header {
+        padding-top: calc(0.75rem + var(--safe-top));
+        margin-top: 0 !important;
+        border-radius: 0 0 0.75rem 0.75rem !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      /* Footer: stick to bottom with safe-area */
+      footer {
+        margin-bottom: 0 !important;
+        padding-bottom: calc(0.75rem + var(--safe-bottom));
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      /* Chat main area: full horizontal on mobile */
+      #chat-container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.5rem !important;
+      }
+
+      /* Message bubbles: slightly wider on small screens */
+      #message-list>div {
+        max-width: 95% !important;
+      }
+
+      /* Mic and send buttons: larger touch target on mobile */
+      #btn-mic,
+      #btn-send {
+        height: 44px !important;
+        width: 44px !important;
+        min-width: 44px;
+        min-height: 44px;
+        flex-shrink: 0;
+      }
+
+      /* Footer input area: comfortable on mobile */
+      #prompt-input {
+        font-size: 16px !important;
+        /* Prevents iOS auto-zoom on focus */
+        min-height: 40px;
+      }
+
+      /* Listening status: full width on mobile */
+      #listening-status {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+      }
+
+      /* Welcome card: full width on mobile */
+      #chat-welcome {
+        padding: 1.25rem !important;
+        max-width: 100% !important;
+      }
+
+      /* Wave canvas: reduce on mobile */
+      #wave-canvas {
+        height: 20px;
+      }
+
+      /* Links modal: full width */
+      #links-modal>div:last-of-type {
+        margin: 0.5rem !important;
+        max-width: calc(100vw - 1rem) !important;
+      }
+
+      /* Preset prompt buttons: full width stacked */
+      #chat-welcome .grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Export button text: always hidden on mobile to save space */
+      #btn-export span {
+        display: none !important;
+      }
+
+      /* Markdown code blocks: horizontal scroll, no wrap */
+      .markdown-content pre {
+        white-space: pre !important;
+        word-break: normal !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    /* Medium screens: slightly loosen layout */
+    @media (min-width: 641px) and (max-width: 1023px) {
+      #chat-welcome {
+        max-width: 90% !important;
+      }
+
+      header,
+      footer {
+        margin-left: 0.5rem !important;
+        margin-right: 0.5rem !important;
+      }
+    }
+
+    /* Prevent text size adjustments on mobile rotation */
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+  </style>
+</head>
+
+<body class="h-full text-slate-100 font-sans flex flex-col overflow-hidden relative" style="height: 100dvh;">
+
+  <div class="absolute inset-0 cyber-grid pointer-events-none z-0"></div>
+
+  <div id="ambient-orb-1"
+    class="absolute -top-40 -left-40 w-96 h-96 rounded-full blur-[120px] bg-violet-600/10 pointer-events-none z-0 transition-all duration-[2000ms]">
+  </div>
+  <div id="ambient-orb-2"
+    class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full blur-[120px] bg-fuchsia-600/10 pointer-events-none z-0 transition-all duration-[2000ms]">
+  </div>
+
+  <header
+    class="glass-panel mx-2 sm:mx-4 mt-2 sm:mt-4 p-3 sm:p-4 rounded-xl flex items-center justify-between z-10 relative select-none">
+    <div class="flex items-center gap-3">
+      <div class="relative flex items-center justify-center">
+        <div id="logo-glow"
+          class="absolute inset-0 bg-violet-500/30 blur-md rounded-full scale-110 transition-colors duration-1000">
+        </div>
+        <div id="logo-ring-1"
+          class="w-8 h-8 rounded-full border border-violet-500/50 animate-spin-slow flex items-center justify-center transition-colors duration-1000">
+          <div class="w-6 h-6 rounded-full border border-dashed border-violet-400/60 flex items-center justify-center">
+            <div id="logo-core" class="w-3 h-3 rounded-full bg-violet-500 transition-colors duration-1000"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h1
+          class="font-orbitron font-black text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-slate-200 to-indigo-300">
+          Dual Pulse<span class="text-xs align-super opacity-60 font-medium">.AI</span>
+        </h1>
+        <p class="text-[9px] font-mono tracking-widest text-slate-400 uppercase">SYS.STATUS: <span id="sys-status"
+            class="text-emerald-400 font-bold">ONLINE</span></p>
+      </div>
+    </div>
+
+    <div class="hidden md:flex items-center gap-6 text-xs font-mono">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-slate-400">STT Engine</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-slate-400">TTS Synthesis</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-400">Mood:</span>
+        <span id="current-mood-tag"
+          class="px-2 py-0.5 rounded bg-violet-950/60 border border-violet-500/30 text-violet-300 font-bold uppercase transition-colors duration-1000">Calm</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button id="btn-export" title="Export Conversation Transcript"
+        class="glass-input p-2 rounded-lg text-slate-300 hover:text-white hover:border-violet-500/50 transition-all flex items-center gap-2 cursor-pointer">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        <span class="hidden sm:inline text-xs font-mono">Export Chat</span>
+      </button>
+
+      <button id="btn-settings" title="System Settings"
+        class="glass-input p-2 rounded-lg text-slate-300 hover:text-white hover:border-violet-500/50 transition-all cursor-pointer">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-6 z-10 relative select-text">
+
+    <div id="chat-welcome"
+      class="m-auto max-w-xl text-center flex flex-col items-center justify-center p-8 glass-panel rounded-2xl select-none">
+      <div
+        class="w-16 h-16 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center mb-4 text-violet-400">
+        <i data-lucide="bot" class="w-8 h-8 animate-pulse-slow"></i>
+      </div>
+      <h2 class="font-orbitron font-bold text-xl mb-2 text-slate-200">Dual Pulse Cognitive Console</h2>
+      <p class="text-sm text-slate-400 mb-6 max-w-md leading-relaxed">
+        An interactive AI Agent executing speech integration workflows. Speak or type to begin. The interface adjusts
+        color matching the AI's response sentiment.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left font-mono text-xs text-slate-300">
+        <button onclick="usePresetPrompt('Analyze this code block: const x = y => y * 2;')"
+          class="glass-input p-3 rounded-lg text-left hover:border-violet-500/40 hover:bg-violet-950/20 transition-all group flex justify-between items-center cursor-pointer">
+          <span>Explain some technical code</span>
+          <i data-lucide="arrow-right"
+            class="w-3.5 h-3.5 text-slate-500 group-hover:text-violet-400 transition-colors"></i>
+        </button>
+        <button onclick="usePresetPrompt('Draft a warning message about a server critical memory exception.')"
+          class="glass-input p-3 rounded-lg text-left hover:border-violet-500/40 hover:bg-violet-950/20 transition-all group flex justify-between items-center cursor-pointer">
+          <span>Simulate warning output</span>
+          <i data-lucide="arrow-right"
+            class="w-3.5 h-3.5 text-slate-500 group-hover:text-violet-400 transition-colors"></i>
+        </button>
+        <button onclick="usePresetPrompt('Tell me something exciting about quantum mechanics in a joyful tone!')"
+          class="glass-input p-3 rounded-lg text-left hover:border-violet-500/40 hover:bg-violet-950/20 transition-all group flex justify-between items-center cursor-pointer">
+          <span>Request an excited reply</span>
+          <i data-lucide="arrow-right"
+            class="w-3.5 h-3.5 text-slate-500 group-hover:text-violet-400 transition-colors"></i>
+        </button>
+        <button onclick="usePresetPrompt('Share a calm and relaxing thought about a quiet beach at sunset.')"
+          class="glass-input p-3 rounded-lg text-left hover:border-violet-500/40 hover:bg-violet-950/20 transition-all group flex justify-between items-center cursor-pointer">
+          <span>Initiate a calm meditation</span>
+          <i data-lucide="arrow-right"
+            class="w-3.5 h-3.5 text-slate-500 group-hover:text-violet-400 transition-colors"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="message-list" class="w-full max-w-4xl mx-auto flex flex-col gap-6">
+    </div>
+
+  </main>
+
+  <div id="listening-status" class="hidden z-10 mx-auto max-w-xl w-full px-4 relative pointer-events-none select-none">
+    <div
+      class="glass-panel p-3 rounded-xl border-dashed border-violet-500/40 flex items-center justify-between gap-4 animate-pulse">
+      <div class="flex items-center gap-3">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+          <span id="active-listen-dot" class="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
+        </span>
+        <span class="text-xs font-mono font-bold tracking-wider text-slate-300">LISTENING:</span>
+      </div>
+      <p id="interim-ghost-text" class="text-xs italic text-slate-400 flex-1 truncate text-left font-mono">
+        (Start speaking to view voice ghost text...)
+      </p>
+    </div>
+  </div>
+
+  <div class="w-full max-w-4xl mx-auto px-4 z-10 pointer-events-none">
+    <canvas id="wave-canvas" class="w-full h-8 opacity-65 transition-all duration-1000"></canvas>
+  </div>
+
+  <footer class="glass-panel mx-2 sm:mx-4 mb-2 sm:mb-4 p-3 sm:p-4 rounded-xl z-10 relative select-none">
+    <div class="max-w-4xl mx-auto flex gap-3 items-end">
+      <div class="flex-1 glass-input rounded-xl overflow-hidden flex items-end p-2 pr-3">
+        <textarea id="prompt-input" rows="1" placeholder="Ask Aether something... (Ctrl+Enter to send)"
+          class="w-full bg-transparent border-none focus:outline-none resize-none max-h-36 py-2 px-3 text-slate-100 text-base md:text-sm leading-relaxed"
+          style="height: 40px;"></textarea>
+      </div>
+
+      <button id="btn-mic" title="Activate Speech Input"
+        class="glass-input h-10 w-10 flex items-center justify-center rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer relative">
+        <div id="mic-pulse-ring" class="absolute inset-0 rounded-xl pointer-events-none"></div>
+        <i data-lucide="mic" id="mic-icon" class="w-5 h-5 transition-transform duration-300"></i>
+      </button>
+
+      <button id="btn-send" title="Submit Query"
+        class="h-10 w-10 flex items-center justify-center rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold transition-all cursor-pointer">
+        <i data-lucide="send" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </footer>
+
+  <div id="settings-modal"
+    class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex justify-end invisible opacity-0 transition-all duration-300 select-none">
+    <div id="modal-overlay" class="absolute inset-0 cursor-pointer"></div>
+
+    <div
+      class="w-full max-w-md h-full glass-panel border-y-0 border-r-0 rounded-l-2xl p-6 flex flex-col justify-between z-10 shadow-2xl relative">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-violet-400"></i>
+            <h3 class="font-orbitron font-bold text-lg">System Settings</h3>
+          </div>
+          <button id="btn-close-settings"
+            class="p-1 rounded-md hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-5 overflow-y-auto max-h-[72vh] pr-2">
+
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase">1. AI Model API
+              Provider</label>
+            <select id="config-provider"
+              class="glass-input p-2.5 rounded-lg text-sm bg-slate-900 border-slate-700 text-slate-100 cursor-pointer">
+              <option value="mock">Local Interactive Simulation (No Key Required)</option>
+              <option value="openrouter">⭐ OpenRouter (Recommended — 200+ Models)</option>
+              <option value="gemini">Google Gemini Developer API</option>
+              <option value="openai">OpenAI API (Requires CORS Proxy)</option>
+              <option value="anthropic">Anthropic API (Requires CORS Proxy)</option>
+            </select>
+          </div>
+
+          <div id="endpoint-container" class="hidden flex flex-col gap-2">
+            <label class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase">API Proxy / Custom Base
+              URL</label>
+            <input id="config-endpoint" type="text" placeholder="https://api.openai.com/v1"
+              class="glass-input p-2.5 rounded-lg text-sm bg-slate-900 border-slate-700 text-slate-100" />
+            <p class="text-[9.5px] font-mono text-slate-500">Provide custom base endpoints (e.g. Local Ollama servers or
+              CORS proxies).</p>
+          </div>
+
+          <div id="key-container" class="hidden flex flex-col gap-2">
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase">Secret Authorization
+                Token</label>
+              <span id="api-key-status" class="text-[10px] font-mono text-slate-500">Not Set</span>
+            </div>
+            <div class="relative">
+              <input id="config-key" type="password" placeholder="Enter API Key here..."
+                class="glass-input w-full p-2.5 pr-10 rounded-lg text-sm bg-slate-900 border-slate-700 text-slate-100" />
+              <button id="btn-toggle-key-vis"
+                class="absolute right-3 top-3.5 text-slate-500 hover:text-slate-300 cursor-pointer">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <p id="cors-warning" class="text-[9.5px] font-mono text-amber-500/80">⚠️ WARNING: Direct client browser
+              fetch requests to Anthropic & OpenAI will fail standard CORS checks without a proxy or browser bypass.
+              OpenRouter & Gemini support standard browser-side calls natively.</p>
+          </div>
+
+          <div id="model-container" class="hidden flex flex-col gap-2">
+            <label class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase">Target AI Model</label>
+            <input id="config-model" type="text" placeholder="google/gemini-2.5-flash"
+              class="glass-input p-2.5 rounded-lg text-sm bg-slate-900 border-slate-700 text-slate-100" />
+          </div>
+
+          <div class="border-t border-slate-800/80 pt-4 flex flex-col gap-4">
+            <label class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase">2. TTS Engine
+              Setup</label>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-xs text-slate-400">Speech Target Voice</label>
+              <select id="config-voice"
+                class="glass-input p-2 rounded-lg text-sm bg-slate-900 border-slate-700 text-slate-100 cursor-pointer">
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs text-slate-400 flex justify-between">
+                  <span>Rate Speed</span>
+                  <span id="rate-val" class="font-mono text-violet-400 font-bold">1.0x</span>
+                </label>
+                <input id="config-rate" type="range" min="0.5" max="2" step="0.1" value="1.0"
+                  class="accent-violet-500 cursor-pointer h-2 bg-slate-800 rounded-lg" />
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs text-slate-400 flex justify-between">
+                  <span>Voice Pitch</span>
+                  <span id="pitch-val" class="font-mono text-violet-400 font-bold">1.0</span>
+                </label>
+                <input id="config-pitch" type="range" min="0.5" max="1.5" step="0.1" value="1.0"
+                  class="accent-violet-500 cursor-pointer h-2 bg-slate-800 rounded-lg" />
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-800/80 pt-4 flex flex-col gap-3">
+            <label class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase">3. Behavioral
+              Rules</label>
+
+            <div class="flex justify-between items-center py-1">
+              <div>
+                <p class="text-xs text-slate-200 font-medium">Automatic Text-to-Speech (TTS)</p>
+                <p class="text-[10px] text-slate-500">Read out AI responses aloud instantly.</p>
+              </div>
+              <input id="toggle-auto-speak" type="checkbox" checked
+                class="h-4 w-4 rounded border-slate-700 text-violet-600 focus:ring-violet-500 cursor-pointer" />
+            </div>
+
+            <div class="flex justify-between items-center py-1">
+              <div>
+                <p class="text-xs text-slate-200 font-medium">Auto-Submit Speech Input</p>
+                <p class="text-[10px] text-slate-500">Sends text automatically when silence is detected.</p>
+              </div>
+              <input id="toggle-auto-send" type="checkbox" checked
+                class="h-4 w-4 rounded border-slate-700 text-violet-600 focus:ring-violet-500 cursor-pointer" />
+            </div>
+
+            <div class="flex justify-between items-center py-1">
+              <div>
+                <p class="text-xs text-slate-200 font-medium">Continuous Mic Recognition</p>
+                <p class="text-[10px] text-slate-500">Reactivates recognition automatically after AI finishes speaking.
+                </p>
+              </div>
+              <input id="toggle-continuous-mic" type="checkbox"
+                class="h-4 w-4 rounded border-slate-700 text-violet-600 focus:ring-violet-500 cursor-pointer" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="border-t border-slate-800 pt-4 flex gap-2">
+        <button id="btn-reset-settings"
+          class="flex-1 glass-input py-2 text-xs font-mono font-bold hover:bg-red-950/20 hover:border-red-500/30 text-red-400 rounded-lg cursor-pointer">
+          Reset Defaults
+        </button>
+        <button id="btn-save-settings"
+          class="flex-1 bg-violet-600 hover:bg-violet-500 py-2 text-xs font-mono font-bold text-white rounded-lg cursor-pointer">
+          Apply Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"
+    class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none flex flex-col gap-2">
+  </div>
+
+  <div id="links-modal"
+    class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center invisible opacity-0 transition-all duration-300 select-none">
+    <div id="links-overlay" class="absolute inset-0 cursor-pointer"></div>
+    <div class="glass-panel max-w-md w-full m-4 p-5 rounded-2xl flex flex-col gap-4 shadow-2xl relative z-10">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h4 class="font-orbitron font-bold text-sm text-violet-400">Extracted Hyperlinks</h4>
+        <button id="btn-close-links"
+          class="p-1 rounded-md hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div id="links-modal-list" class="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // System Configuration Settings State (Hardcoded production defaults for evaluation)
+    let config = {
+      provider: 'openrouter',
+      endpoint: 'https://openrouter.ai/api/v1',
+      apiKey: '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', // <-- PASTE YOUR ACTUAL OPENROUTER KEY STRING HERE
+      model: 'google/gemini-2.5-flash',
+      voiceName: '',
+      rate: 1.0,
+      pitch: 1.0,
+      autoSpeak: true,
+      autoSend: true,
+      continuousMic: false
+    };
+
+    // Conversation transcript list for Exporting logs
+    let conversationLogs = [];
+
+    // Web Speech API interfaces
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let synth = window.speechSynthesis;
+    let currentUtterance = null;
+
+    // Core Application state flags
+    let isListening = false;
+    let isSpeaking = false;
+    let isThinking = false;
+    let activeSpeechStreamText = '';
+
+    // Audio Analysis & Visualizer State variables
+    let audioCtx = null;
+    let analyser = null;
+    let micStream = null;
+    let animationFrameId = null;
+    let canvas = document.getElementById('wave-canvas');
+    let ctx = canvas.getContext('2d');
+
+    // Sentiment configurations for theme and glowing updates
+    const MOODS = {
+      calm: {
+        accent: '#8b5cf6',
+        accentRgb: '139, 92, 246',
+        gradientStart: '#080312',
+        gradientEnd: '#140827',
+        glow: 'rgba(139, 92, 246, 0.4)',
+        label: 'Calm'
+      },
+      excited: {
+        accent: '#ec4899',
+        accentRgb: '236, 72, 153',
+        gradientStart: '#0b020a',
+        gradientEnd: '#29001b',
+        glow: 'rgba(236, 72, 153, 0.4)',
+        label: 'Excited'
+      },
+      technical: {
+        accent: '#06b6d4',
+        accentRgb: '6, 182, 212',
+        gradientStart: '#01090f',
+        gradientEnd: '#022130',
+        glow: 'rgba(6, 182, 212, 0.4)',
+        label: 'Technical'
+      },
+      warning: {
+        accent: '#ef4444',
+        accentRgb: '239, 68, 68',
+        gradientStart: '#0d0202',
+        gradientEnd: '#2c0606',
+        glow: 'rgba(239, 68, 68, 0.4)',
+        label: 'Caution'
+      },
+      friendly: {
+        accent: '#10b981',
+        accentRgb: '16, 185, 129',
+        gradientStart: '#010a05',
+        gradientEnd: '#022413',
+        glow: 'rgba(16, 185, 129, 0.4)',
+        label: 'Friendly'
+      },
+      thinking: {
+        accent: '#3b82f6',
+        accentRgb: '59, 130, 246',
+        gradientStart: '#020617',
+        gradientEnd: '#0f172a',
+        glow: 'rgba(59, 130, 246, 0.5)',
+        label: 'Thinking'
+      }
+    };
+
+    // ----------------------------------------------------
+    // INITIALIZATION & UI ROUTINES
+    // ----------------------------------------------------
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+      initializeSpeechSynthesis();
+      initializeSpeechRecognition();
+      setupEventListeners();
+      initializeVisualizerCanvas();
+
+      // Initialize icons
+      lucide.createIcons();
+
+      // Show appropriate form fields in Settings modal based on default provider selection
+      updateSettingsFormUI();
+
+      // Trigger default Canvas simulation wave
+      drawVisualizerWave();
+
+      // Mobile: update placeholder text
+      const isMobileOnLoad = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (!isMobileOnLoad) {
+        document.getElementById('prompt-input').focus();
+      } else {
+        document.getElementById('prompt-input').placeholder = "Tap to type or use mic...";
+      }
+
+      // Mobile: handle viewport height changes from virtual keyboard
+      if (typeof window.visualViewport !== 'undefined') {
+        window.visualViewport.addEventListener('resize', () => {
+          const chatContainer = document.getElementById('chat-container');
+          // Scroll to bottom when keyboard opens/closes
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+      }
+    });
+
+    // Handle responsiveness of Canvas visualizer
+    function initializeVisualizerCanvas() {
+      const resizeCanvas = () => {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = 32; // Fixed compact height
+      };
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+    }
+
+    // Load configs from local storage
+    function loadSettings() {
+      const savedConfig = localStorage.getItem('aether_agent_settings');
+      if (savedConfig) {
+        try {
+          config = { ...config, ...JSON.parse(savedConfig) };
+        } catch (e) {
+          console.error("Error loading localStorage configs:", e);
+        }
+      } else {
+        // PERMANENT FIX: If new device/empty storage, instantly save your hardcoded key into their browser memory!
+        localStorage.setItem('aether_agent_settings', JSON.stringify(config));
+      }
+
+      // Populate input field DOM elements with stored values
+      document.getElementById('config-provider').value = config.provider;
+      document.getElementById('config-endpoint').value = config.endpoint;
+
+      // FIXED: Fallback to the code's default hardcoded key if localStorage field was blank
+      document.getElementById('config-key').value = config.apiKey;
+
+      document.getElementById('config-model').value = config.model;
+      document.getElementById('config-rate').value = config.rate;
+      document.getElementById('rate-val').innerText = config.rate.toFixed(1) + 'x';
+      document.getElementById('config-pitch').value = config.pitch;
+      document.getElementById('pitch-val').innerText = config.pitch.toFixed(1);
+
+      document.getElementById('toggle-auto-speak').checked = config.autoSpeak;
+      document.getElementById('toggle-auto-send').checked = config.autoSend;
+      document.getElementById('toggle-continuous-mic').checked = config.continuousMic;
+
+      updateApiKeyStatusText();
+    }
+
+    // Save configurations locally
+    function saveSettings() {
+      config.provider = document.getElementById('config-provider').value;
+      config.endpoint = document.getElementById('config-endpoint').value.trim();
+      config.apiKey = document.getElementById('config-key').value.trim();
+      config.model = document.getElementById('config-model').value.trim();
+      config.voiceName = document.getElementById('config-voice').value;
+      config.rate = parseFloat(document.getElementById('config-rate').value);
+      config.pitch = parseFloat(document.getElementById('config-pitch').value);
+
+      config.autoSpeak = document.getElementById('toggle-auto-speak').checked;
+      config.autoSend = document.getElementById('toggle-auto-send').checked;
+      config.continuousMic = document.getElementById('toggle-continuous-mic').checked;
+
+      localStorage.setItem('aether_agent_settings', JSON.stringify(config));
+      updateApiKeyStatusText();
+
+      showToast("System configurations updated successfully.");
+      toggleSettingsModal(false);
+    }
+
+    // Helper text indicating if API credentials exist
+    function updateApiKeyStatusText() {
+      const keyStatus = document.getElementById('api-key-status');
+      if (config.apiKey) {
+        keyStatus.innerText = 'Key Configured';
+        keyStatus.className = 'text-[10px] font-mono text-emerald-400';
+      } else {
+        keyStatus.innerText = 'Not Set';
+        keyStatus.className = 'text-[10px] font-mono text-slate-500';
+      }
+    }
+
+    // Toggle fields based on Provider select selection
+    function updateSettingsFormUI() {
+      const provider = document.getElementById('config-provider').value;
+      const keyContainer = document.getElementById('key-container');
+      const endpointContainer = document.getElementById('endpoint-container');
+      const modelContainer = document.getElementById('model-container');
+
+      if (provider === 'mock') {
+        keyContainer.classList.add('hidden');
+        endpointContainer.classList.add('hidden');
+        modelContainer.classList.add('hidden');
+      } else {
+        keyContainer.classList.remove('hidden');
+        endpointContainer.classList.remove('hidden');
+        modelContainer.classList.remove('hidden');
+
+        const modelInput = document.getElementById('config-model');
+        const endpointInput = document.getElementById('config-endpoint');
+        const corsWarning = document.getElementById('cors-warning');
+
+        if (provider === 'openrouter') {
+          endpointInput.placeholder = 'https://openrouter.ai/api/v1 (default)';
+          corsWarning.className = 'text-[9.5px] font-mono text-emerald-500/80';
+          corsWarning.innerText = '✅ OpenRouter supports direct browser calls — no proxy needed. Get your key at openrouter.ai/keys';
+          modelInput.value = 'google/gemini-2.5-flash';
+        } else if (provider === 'openai') {
+          endpointInput.placeholder = 'https://api.openai.com/v1';
+          corsWarning.className = 'text-[9.5px] font-mono text-amber-500/80';
+          corsWarning.innerText = '⚠️ WARNING: OpenAI blocks direct browser CORS requests. Use a proxy endpoint or switch to OpenRouter.';
+          if (!modelInput.value || modelInput.value.includes('gemini') || modelInput.value.includes('claude') || modelInput.value.includes('/')) {
+            modelInput.value = 'gpt-4o-mini';
+          }
+        } else if (provider === 'gemini') {
+          endpointInput.placeholder = 'Direct to Google Developer API';
+          corsWarning.className = 'text-[9.5px] font-mono text-emerald-500/80';
+          corsWarning.innerText = '✅ Gemini supports direct browser calls — no proxy needed.';
+          modelInput.value = 'gemini-2.5-flash';
+        } else if (provider === 'anthropic') {
+          endpointInput.placeholder = 'https://api.anthropic.com/v1';
+          corsWarning.className = 'text-[9.5px] font-mono text-amber-500/80';
+          corsWarning.innerText = '⚠️ WARNING: Anthropic blocks direct browser CORS requests. Use a proxy endpoint or switch to OpenRouter.';
+          if (!modelInput.value || modelInput.value.includes('gpt') || modelInput.value.includes('gemini') || modelInput.value.includes('/')) {
+            modelInput.value = 'claude-3-5-sonnet-20241022';
+          }
+        }
+      }
+    }
+
+    // Modal drawer utility handlers
+    function toggleSettingsModal(show) {
+      const modal = document.getElementById('settings-modal');
+      if (show) {
+        cancelSpeech();
+        modal.classList.remove('invisible');
+        modal.classList.add('opacity-100');
+        modal.firstElementChild.nextElementSibling.classList.add('translate-x-0');
+      } else {
+        modal.classList.add('opacity-0');
+        modal.classList.add('invisible');
+        modal.firstElementChild.nextElementSibling.classList.remove('translate-x-0');
+      }
+    }
+
+    // Toast alert notices
+    function showToast(text, duration = 3000) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'glass-panel px-4 py-2.5 rounded-lg text-xs font-mono border-violet-500/30 text-slate-100 flex items-center gap-2 animate-bounce shadow-lg';
+      toast.innerHTML = `<i data-lucide="info" class="w-3.5 h-3.5 text-violet-400"></i> <span>${text}</span>`;
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.remove();
+      }, duration);
+    }
+
+    // Quick loading presets
+    function usePresetPrompt(text) {
+      cancelSpeech();
+      const input = document.getElementById('prompt-input');
+      input.value = text;
+      adjustTextareaHeight(input);
+      submitMessage();
+    }
+
+    // Textarea growing text handler
+    function adjustTextareaHeight(el) {
+      el.style.height = '40px';
+      el.style.height = el.scrollHeight + 'px';
+    }
+
+    // ----------------------------------------------------
+    // SPEECH SYNTHESIS ENGINE (TTS)
+    // ----------------------------------------------------
+
+    function initializeSpeechSynthesis() {
+      if (!synth) {
+        showToast("SpeechSynthesis synthesis is not supported on this browser.", 5000);
+        return;
+      }
+
+      const loadVoices = () => {
+        const voices = synth.getVoices();
+        const voiceSelect = document.getElementById('config-voice');
+        voiceSelect.innerHTML = '';
+
+        let selectedIndex = 0;
+        voices.forEach((voice, i) => {
+          const option = document.createElement('option');
+          option.value = voice.name;
+          option.innerText = `${voice.name} (${voice.lang})`;
+          if (voice.name === config.voiceName) {
+            selectedIndex = i;
+          } else if (!config.voiceName && voice.default) {
+            selectedIndex = i;
+          }
+          voiceSelect.appendChild(option);
+        });
+
+        if (voices.length > 0) {
+          voiceSelect.selectedIndex = selectedIndex;
+        }
+      };
+
+      loadVoices();
+      if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = loadVoices;
+      }
+    }
+
+    function cleanTextForSpeech(text) {
+      return text
+        .replace(/```[\s\S]*?```/g, ' [reading code snippet omitted] ')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/[*_#\-+]+/g, '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .trim();
+    }
+
+    function speakText(text) {
+      if (!synth || !config.autoSpeak) return;
+
+      cancelSpeech();
+
+      const spokenContent = cleanTextForSpeech(text);
+      if (!spokenContent) return;
+
+      currentUtterance = new SpeechSynthesisUtterance(spokenContent);
+
+      const voices = synth.getVoices();
+      const selectedVoice = voices.find(v => v.name === config.voiceName);
+      if (selectedVoice) {
+        currentUtterance.voice = selectedVoice;
+      }
+
+      currentUtterance.rate = config.rate;
+      currentUtterance.pitch = config.pitch;
+
+      currentUtterance.onstart = () => {
+        isSpeaking = true;
+        document.body.classList.add('ai-speaking');
+      };
+
+      currentUtterance.onend = () => {
+        isSpeaking = false;
+        document.body.classList.remove('ai-speaking');
+        currentUtterance = null;
+
+        if (config.continuousMic) {
+          startSpeechRecognition();
+        }
+      };
+
+      currentUtterance.onerror = (e) => {
+        console.error("SpeechSynthesis error: ", e);
+        isSpeaking = false;
+        document.body.classList.remove('ai-speaking');
+        currentUtterance = null;
+      };
+
+      synth.speak(currentUtterance);
+    }
+
+    function cancelSpeech() {
+      if (synth && synth.speaking) {
+        synth.cancel();
+        isSpeaking = false;
+        document.body.classList.remove('ai-speaking');
+        currentUtterance = null;
+        console.log("SpeechSynthesis aborted by Barge-In handler.");
+      }
+    }
+
+    // ----------------------------------------------------
+    // SPEECH RECOGNITION ENGINE (STT) - MOBILE RESILIENT
+    // ----------------------------------------------------
+
+    function initializeSpeechRecognition() {
+      if (!SpeechRecognition) {
+        showToast("SpeechRecognition API is unsupported on this browser. Use Chrome/Safari.", 5000);
+        document.getElementById('btn-mic').classList.add('opacity-40', 'cursor-not-allowed');
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+
+      const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      recognition.continuous = !isMobileDevice;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        document.getElementById('listening-status').classList.remove('hidden');
+        document.getElementById('prompt-input').placeholder = "Listening... speak now.";
+
+        const micIcon = document.getElementById('mic-icon');
+        micIcon.classList.add('text-rose-500');
+        document.getElementById('btn-mic').classList.add('mic-active-glow');
+
+        startMicAudioAnalysis();
+      };
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+
+        if (interimTranscript) {
+          document.getElementById('interim-ghost-text').innerText = interimTranscript;
+        }
+
+        if (finalTranscript) {
+          const input = document.getElementById('prompt-input');
+          const space = input.value && !input.value.endsWith(' ') ? ' ' : '';
+          input.value += space + finalTranscript.trim();
+          adjustTextareaHeight(input);
+          document.getElementById('interim-ghost-text').innerText = "(Waiting for next phrase...)";
+
+          if (isMobileDevice) {
+            stopSpeechRecognition();
+          }
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("SpeechRecognition error:", event.error);
+        if (event.error === 'not-allowed') {
+          showToast("Microphone permission was denied. Verify browser permissions.", 4000);
+        } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+          showToast(`STT Error: ${event.error}`);
+        }
+        stopSpeechRecognition();
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        document.getElementById('listening-status').classList.add('hidden');
+        // Mobile-friendly placeholder
+        const isMob = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        document.getElementById('prompt-input').placeholder = isMob ? "Tap to type or use mic..." : "Ask Aether something... (Ctrl+Enter to send)";
+
+        const micIcon = document.getElementById('mic-icon');
+        micIcon.classList.remove('text-rose-500');
+        document.getElementById('btn-mic').classList.remove('mic-active-glow');
+
+        stopMicAudioAnalysis();
+
+        if (config.autoSend) {
+          const text = document.getElementById('prompt-input').value.trim();
+          if (text) {
+            submitMessage();
+          }
+        }
+      };
+    }
+
+    function startSpeechRecognition() {
+      if (!recognition) return;
+      cancelSpeech();
+      try {
+        recognition.start();
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    function stopSpeechRecognition() {
+      if (!recognition) return;
+      try {
+        recognition.stop();
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    function toggleMicrophone() {
+      if (isListening) {
+        stopSpeechRecognition();
+      } else {
+        startSpeechRecognition();
+      }
+    }
+
+    // ----------------------------------------------------
+    // REAL-TIME AUDIO WAVEFORM VISUALIZER
+    // ----------------------------------------------------
+
+    // Bind to client mic stream using AudioContext analyser node
+    async function startMicAudioAnalysis() {
+      // MOBILE SAFETY CHECK: Skip processing visualizer streams on mobile to prevent permission freezes
+      const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobileDevice) {
+        console.log("Mobile device detected. Using procedural fallback visualizer to prevent device stream lock.");
+        analyser = null;
+        return;
+      }
+
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+
+        const source = audioCtx.createMediaStreamSource(micStream);
+        source.connect(analyser);
+      } catch (err) {
+        console.warn("Unable to capture microphone AudioContext for visualizer: ", err);
+        analyser = null;
+      }
+    }
+    function stopMicAudioAnalysis() {
+      if (micStream) {
+        micStream.getTracks().forEach(track => track.stop());
+        micStream = null;
+      }
+      if (audioCtx && audioCtx.state !== 'closed') {
+        audioCtx.close();
+        audioCtx = null;
+      }
+      analyser = null;
+    }
+
+    function drawVisualizerWave() {
+      animationFrameId = requestAnimationFrame(drawVisualizerWave);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerY = height / 2;
+
+      const activeColor = getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#8b5cf6';
+
+      ctx.strokeStyle = activeColor;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = activeColor;
+
+      if (isListening) {
+        if (analyser) {
+          const bufferLength = analyser.frequencyBinCount;
+          const dataArray = new Uint8Array(bufferLength);
+          analyser.getByteFrequencyData(dataArray);
+
+          ctx.beginPath();
+          let x = 0;
+          const sliceWidth = width / bufferLength;
+
+          for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = centerY + (v - 1) * centerY * Math.sin(i * 0.15 + Date.now() * 0.005);
+
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+            x += sliceWidth;
+          }
+          ctx.stroke();
+        } else {
+          drawProceduralWaves(3, 15, 0.03, activeColor);
+        }
+      } else if (isSpeaking) {
+        drawProceduralWaves(4, 12, 0.02, activeColor);
+      } else if (isThinking) {
+        drawProceduralWaves(2, 6, 0.01, activeColor);
+      } else {
+        drawProceduralWaves(1, 2, 0.003, activeColor);
+      }
+    }
+
+    function drawProceduralWaves(waveCount, maxAmplitude, speedFactor, strokeStyle) {
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerY = height / 2;
+      const time = Date.now() * speedFactor;
+
+      for (let w = 0; w < waveCount; w++) {
+        ctx.beginPath();
+        const amplitude = maxAmplitude * (1 - w * 0.22);
+        const frequency = 0.005 + w * 0.004;
+        const phase = w * Math.PI / 2 + time;
+
+        ctx.strokeStyle = strokeStyle;
+        ctx.globalAlpha = 1.0 - w * 0.22;
+        ctx.lineWidth = 1.5;
+
+        for (let x = 0; x < width; x += 4) {
+          const y = centerY + amplitude * Math.sin(x * frequency + phase) * Math.sin(x * 0.001);
+          if (x === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
+    // ----------------------------------------------------
+    // DYNAMIC EMOTION SENTIMENT ENGINE (Feature B)
+    // ----------------------------------------------------
+
+    function analyzeSentimentAndShiftTheme(text) {
+      const lower = text.toLowerCase();
+
+      const excitedKeywords = ['excited', 'happy', 'wonderful', 'joy', 'amazing', 'awesome', 'thrilled', 'fantastic', 'great', 'success', 'glad', 'congrats', 'cheers'];
+      const warningKeywords = ['error', 'fail', 'warning', 'danger', 'critical', 'stop', 'exception', 'alert', 'incident', 'invalid', 'blocked', 'crash', 'terminate'];
+      const technicalKeywords = ['code', 'function', 'api', 'const', 'let', 'database', 'system', 'query', 'logic', 'json', 'class', 'struct', 'algorithm', 'compile', 'parse', 'extract'];
+      const friendlyKeywords = ['thanks', 'welcome', 'hello', 'hi', 'assist', 'help', 'please', 'support', 'cooperate', 'partner', 'friend'];
+
+      let detectedMood = 'calm';
+
+      if (warningKeywords.some(kw => lower.includes(kw))) {
+        detectedMood = 'warning';
+      } else if (technicalKeywords.some(kw => lower.includes(kw))) {
+        detectedMood = 'technical';
+      } else if (excitedKeywords.some(kw => lower.includes(kw))) {
+        detectedMood = 'excited';
+      } else if (friendlyKeywords.some(kw => lower.includes(kw))) {
+        detectedMood = 'friendly';
+      }
+
+      applyMoodTheme(detectedMood);
+    }
+
+    function applyMoodTheme(moodKey) {
+      const mood = MOODS[moodKey] || MOODS.calm;
+      const root = document.documentElement;
+
+      root.style.setProperty('--accent-primary', mood.accent);
+      root.style.setProperty('--accent-primary-rgb', mood.accentRgb);
+      root.style.setProperty('--accent-glow', mood.glow);
+      root.style.setProperty('--bg-gradient-start', mood.gradientStart);
+      root.style.setProperty('--bg-gradient-end', mood.gradientEnd);
+      root.style.setProperty('--mic-glow', `0 0 25px ${mood.accent}`);
+      root.style.setProperty('--glass-border', `rgba(${mood.accentRgb}, 0.2)`);
+
+      const moodTag = document.getElementById('current-mood-tag');
+      moodTag.innerText = mood.label;
+      moodTag.className = `px-2 py-0.5 rounded bg-slate-900 border text-xs font-bold uppercase transition-colors duration-1000`;
+      moodTag.style.color = mood.accent;
+      moodTag.style.borderColor = `rgba(${mood.accentRgb}, 0.3)`;
+
+      document.getElementById('logo-core').style.backgroundColor = mood.accent;
+      document.getElementById('logo-ring-1').style.borderColor = `rgba(${mood.accentRgb}, 0.5)`;
+      document.getElementById('logo-glow').style.backgroundColor = `rgba(${mood.accentRgb}, 0.3)`;
+      document.getElementById('ambient-orb-1').style.backgroundColor = `rgba(${mood.accentRgb}, 0.12)`;
+    }
+
+    // ----------------------------------------------------
+    // CONTEXT-AWARE SMART TAG ENGINE (Feature C)
+    // ----------------------------------------------------
+
+    function parseAndGenerateSmartTags(text, bubbleEl) {
+      const tagsContainer = document.createElement('div');
+      tagsContainer.className = 'flex flex-wrap gap-2 mt-3.5 border-t border-slate-800/60 pt-3';
+
+      let tagsAdded = false;
+
+      const codeRegex = /```([\s\S]*?)```/g;
+      const codeMatches = [...text.matchAll(codeRegex)];
+
+      if (codeMatches.length > 0) {
+        const copyCodeBtn = createSmartTag('Copy Code', 'code', () => {
+          const codeToCopy = codeMatches[0][1].replace(/^[a-zA-Z]+\n/, '');
+          navigator.clipboard.writeText(codeToCopy.trim())
+            .then(() => showToast("Code block copied to clipboard!"))
+            .catch(() => showToast("Copy failed."));
+        });
+        tagsContainer.appendChild(copyCodeBtn);
+        tagsAdded = true;
+      }
+
+      const urlRegex = /(https?:\/\/[^\s\)]+)/g;
+      const urlMatches = text.match(urlRegex) ? [...new Set(text.match(urlRegex))] : [];
+
+      if (urlMatches.length > 0) {
+        const extractLinksBtn = createSmartTag('Extract Links', 'link-2', () => {
+          showLinksModal(urlMatches);
+        });
+        tagsContainer.appendChild(extractLinksBtn);
+        tagsAdded = true;
+      }
+
+      const saveSummaryBtn = createSmartTag('Save Summary', 'file-text', () => {
+        const timestamp = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+        const summaryText = `--- AETHER TURN SUMMARY ---\nTimestamp: ${timestamp}\nContent:\n${text.substring(0, 1000)}${text.length > 1000 ? '...' : ''}`;
+
+        const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Aether_Summary_${Date.now()}.txt`;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+      tagsContainer.appendChild(saveSummaryBtn);
+      tagsAdded = true;
+
+      const copyAllBtn = createSmartTag('Copy All', 'clipboard', () => {
+        navigator.clipboard.writeText(text)
+          .then(() => showToast("Entire response copied!"))
+          .catch(() => showToast("Failed to copy."));
+      });
+      tagsContainer.appendChild(copyAllBtn);
+
+      if (tagsAdded) {
+        bubbleEl.appendChild(tagsContainer);
+      }
+    }
+
+    function createSmartTag(label, iconName, action) {
+      const btn = document.createElement('button');
+      btn.className = 'glass-panel px-2.5 py-1 rounded-md text-[10px] font-mono border-slate-700/80 hover:border-violet-500/50 hover:bg-violet-950/20 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer';
+      btn.innerHTML = `<i data-lucide="${iconName}" class="w-3 h-3 text-slate-400"></i> ${label}`;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        action();
+      });
+      return btn;
+    }
+
+    function showLinksModal(urls) {
+      const modal = document.getElementById('links-modal');
+      const listEl = document.getElementById('links-modal-list');
+      listEl.innerHTML = '';
+
+      urls.forEach(url => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded bg-slate-900 border border-slate-800 gap-4';
+        item.innerHTML = `
+          <a href="${url}" target="_blank" class="text-xs font-mono truncate text-violet-400 hover:underline flex-1">${url}</a>
+          <button class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 cursor-pointer" title="Copy URL">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          </button>
+        `;
+        item.querySelector('button').addEventListener('click', () => {
+          navigator.clipboard.writeText(url)
+            .then(() => showToast("Link copied!"))
+            .catch(() => showToast("Copy failed."));
+        });
+        listEl.appendChild(item);
+      });
+
+      modal.classList.remove('invisible');
+      modal.classList.add('opacity-100');
+      lucide.createIcons();
+    }
+
+    function closeLinksModal() {
+      const modal = document.getElementById('links-modal');
+      modal.classList.add('opacity-0');
+      modal.classList.add('invisible');
+    }
+
+    // ----------------------------------------------------
+    // CONVERSATION RENDERING & TIMESTAMPS
+    // ----------------------------------------------------
+
+    function getFormattedTimestamp() {
+      const date = new Date();
+      const pad = (n) => n.toString().padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    }
+
+    function appendMessageBubble(sender, text, isFinal = true) {
+      const welcomeScreen = document.getElementById('chat-welcome');
+      if (welcomeScreen) welcomeScreen.remove();
+
+      const messageList = document.getElementById('message-list');
+      const timestamp = getFormattedTimestamp();
+
+      let bubbleContainer = document.getElementById('streaming-ai-bubble');
+
+      if (sender === 'User' || (!bubbleContainer && isFinal === false)) {
+        bubbleContainer = document.createElement('div');
+        bubbleContainer.className = `flex flex-col gap-1 max-w-[85%] ${sender === 'User' ? 'self-end items-end ml-auto' : 'self-start items-start mr-auto'}`;
+
+        if (sender === 'AI' && !isFinal) {
+          bubbleContainer.id = 'streaming-ai-bubble';
+        }
+
+        const metaEl = document.createElement('span');
+        metaEl.className = 'text-[9.5px] font-mono text-slate-500 px-1';
+        metaEl.innerText = `${sender.toUpperCase()} • ${timestamp}`;
+
+        const bubbleContent = document.createElement('div');
+        bubbleContent.className = `glass-panel px-4.5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-lg select-text markdown-content w-full h-auto ${sender === 'User'
+          ? 'bg-violet-950/15 border-violet-500/20 text-slate-200 rounded-tr-none'
+          : 'bg-slate-900/60 border-slate-800 text-slate-100 rounded-tl-none'
+          }`;
+
+        if (sender === 'AI' && !isFinal) {
+          bubbleContent.classList.add('typing-cursor');
+        }
+
+        bubbleContent.innerHTML = sender === 'User' ? text : marked.parse(text);
+
+        bubbleContainer.appendChild(metaEl);
+        bubbleContainer.appendChild(bubbleContent);
+        messageList.appendChild(bubbleContainer);
+      } else if (sender === 'AI' && bubbleContainer) {
+        const bubbleContent = bubbleContainer.querySelector('.markdown-content');
+        bubbleContent.innerHTML = marked.parse(text);
+
+        if (isFinal) {
+          bubbleContainer.removeAttribute('id');
+          bubbleContent.classList.remove('typing-cursor');
+          parseAndGenerateSmartTags(text, bubbleContent);
+        }
+      }
+
+      document.getElementById('chat-container').scrollTo({
+        top: document.getElementById('chat-container').scrollHeight,
+        behavior: 'smooth'
+      });
+
+      if (isFinal) {
+        conversationLogs.push({
+          timestamp: timestamp,
+          sender: sender,
+          message: text
+        });
+
+        if (sender === 'AI') {
+          analyzeSentimentAndShiftTheme(text);
+        }
+      }
+
+      lucide.createIcons();
+    }
+
+    // ----------------------------------------------------
+    // CONVERSATION TRANSCRIPT EXPORT (Core requirement)
+    // ----------------------------------------------------
+
+    function exportConversationTranscript() {
+      if (conversationLogs.length === 0) {
+        showToast("No active conversation transcript exists to export.");
+        return;
+      }
+
+      let transcriptText = "AETHER.AI CONVERSATION LOG TRANSCRIPT\n";
+      transcriptText += `Export Date: ${getFormattedTimestamp()}\n`;
+      transcriptText += "========================================================\n\n";
+
+      conversationLogs.forEach(entry => {
+        transcriptText += `[${entry.timestamp}] [${entry.sender}]: ${entry.message}\n`;
+      });
+
+      const blob = new Blob([transcriptText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Aether_ChatLog_${Date.now()}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      showToast("Transcript log file downloaded.");
+    }
+
+    // ----------------------------------------------------
+    // STREAMING LLM CLIENT INTEGRATIONS
+    // ----------------------------------------------------
+
+    async function submitMessage() {
+      const input = document.getElementById('prompt-input');
+      const userText = input.value.trim();
+      if (!userText || isThinking) return;
+
+      input.value = '';
+      adjustTextareaHeight(input);
+      cancelSpeech();
+
+      if (isListening) {
+        stopSpeechRecognition();
+      }
+
+      appendMessageBubble('User', userText);
+
+      isThinking = true;
+      applyMoodTheme('thinking');
+      appendMessageBubble('AI', '', false);
+
+      activeSpeechStreamText = '';
+
+      try {
+        if (config.provider === 'mock') {
+          await executeMockStreamingAI(userText);
+        } else if (config.provider === 'openrouter') {
+          await executeOpenRouterStreamingAPI(userText);
+        } else if (config.provider === 'openai') {
+          await executeOpenAIStreamingAPI(userText);
+        } else if (config.provider === 'gemini') {
+          await executeGeminiStreamingAPI(userText);
+        } else if (config.provider === 'anthropic') {
+          await executeAnthropicStreamingAPI(userText);
+        }
+      } catch (err) {
+        console.error("API client execution exception:", err);
+        const errorText = `⚠️ SYSTEM ERR: Unable to fetch response from backend: ${err.message}. Check browser logs and verified network credentials.`;
+        updateStreamingAIBubbleText(errorText);
+        applyMoodTheme('warning');
+      } finally {
+        isThinking = false;
+      }
+    }
+
+    function updateStreamingAIBubbleText(text, isFinal = false) {
+      appendMessageBubble('AI', text, isFinal);
+      if (isFinal) {
+        speakText(text);
+      }
+    }
+
+    function executeMockStreamingAI(prompt) {
+      return new Promise((resolve) => {
+        const lower = prompt.toLowerCase();
+        let response = '';
+
+        if (lower.includes('code') || lower.includes('function') || lower.includes('program')) {
+          response = "Here is a clean JavaScript function pattern to solve that query:\n\n```js\n// Functional sequence calculation\nconst calculateSequence = (limit) => {\n  const results = [];\n  for (let i = 1; i <= limit; i++) {\n    results.push(i * Math.PI);\n  }\n  return results;\n};\n\nconsole.log(calculateSequence(5));\n```\n\nYou can implement this in your project. Check the 'Copy Code' smart tag below to copy this code block.";
+        } else if (lower.includes('error') || lower.includes('fail') || lower.includes('warning') || lower.includes('crash')) {
+          response = "⚠️ CRITICAL SYSTEM EXCEPTION DETECTED: The central CPU kernel reports an illegal memory pointer assignment. Memory stack overflow risk is high. Please check the network log trace instantly or reset system variables. Warning exceptions must be handled before runtime.";
+        } else if (lower.includes('excited') || lower.includes('joy') || lower.includes('happy') || lower.includes('quantum')) {
+          response = "This is absolutely incredible! Quantum mechanics reveals that subatomic particles exist in multiple superpositions at once! That means reality itself is a beautiful dance of infinite possibilities until it's observed! It is a thrilling mystery that is absolutely mind-blowing!";
+        } else if (lower.includes('calm') || lower.includes('relax') || lower.includes('beach')) {
+          response = "Take a slow, deep breath. Picture a quiet, endless beach at sunset. The warm amber waves roll in gently, whispering secrets of peace, and retreat back into the calm blue ocean. There is no rush, no tension. Just stillness.";
+        } else {
+          response = "Greetings. I am Aether, your autonomous cognitive assistant. I am currently running in simulated demonstration mode. To connect me to a live streaming LLM, open Settings and supply your API credentials. \n\nI can speak back to you, process real-time voice, analyze emotional themes, and help extract links: e.g. visit https://google.com or https://github.com for details.";
+        }
+
+        let index = 0;
+        const speed = 25;
+
+        function streamChunk() {
+          if (index < response.length) {
+            activeSpeechStreamText += response.charAt(index);
+            updateStreamingAIBubbleText(activeSpeechStreamText, false);
+            index++;
+            setTimeout(streamChunk, speed);
+          } else {
+            updateStreamingAIBubbleText(activeSpeechStreamText, true);
+            resolve();
+          }
+        }
+
+        setTimeout(streamChunk, 400);
+      });
+    }
+
+    function getContextHistoryPayload(systemPrompt) {
+      let messages = [{ role: 'system', content: systemPrompt }];
+      const recentLogs = conversationLogs.slice(-10);
+      recentLogs.forEach(entry => {
+        messages.push({
+          role: entry.sender === 'User' ? 'user' : 'assistant',
+          content: entry.message
+        });
+      });
+      return messages;
+    }
+
+    async function executeOpenRouterStreamingAPI(userPrompt) {
+      // FORCED HARD-WIRE: This completely bypasses localStorage checks during execution
+      const apiKey = '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';
+
+      if (!apiKey || apiKey.includes('PASTE_YOUR')) {
+        throw new Error("Missing OpenRouter API Key. Please open System Settings and configure your authorization token.");
+      }
+
+      const baseURL = config.endpoint || 'https://openrouter.ai/api/v1';
+      const url = `${baseURL}/chat/completions`;
+
+      const systemMessage = "You are Dual Pulse, a precise and direct AI assistant. Provide helpful, standard answers structured cleanly with markdown. Do not add robotic prefixes, brackets, status initializations, or structural headers like [QUERY RECEIVED]. Return pure text answers.";
+      const messages = getContextHistoryPayload(systemMessage);
+      messages.push({ role: 'user', content: userPrompt });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': window.location.href,
+          'X-Title': 'Aether.AI Agent'
+        },
+        body: JSON.stringify({
+          model: config.model || 'google/gemini-2.5-flash',
+          messages: messages,
+          max_tokens: 1500,
+          stream: true
+        })
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json().catch(() => ({}));
+        throw new Error(errorJson?.error?.message || `HTTP Code ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let finished = false;
+      let streamBuffer = '';
+
+      while (!finished) {
+        const { value, done } = await reader.read();
+        finished = done;
+        if (value) {
+          streamBuffer += decoder.decode(value);
+          const lines = streamBuffer.split('\n');
+          streamBuffer = lines.pop();
+
+          for (const line of lines) {
+            const cleanLine = line.trim();
+            if (cleanLine === 'data: [DONE]') {
+              finished = true;
+              break;
+            }
+            if (cleanLine.startsWith('data: ')) {
+              try {
+                const parsed = JSON.parse(cleanLine.substring(6));
+                const choice = parsed.choices ? parsed.choices[0] : null;
+                if (choice) {
+                  const content = choice.delta?.content || '';
+                  if (content) {
+                    activeSpeechStreamText += content;
+                    updateStreamingAIBubbleText(activeSpeechStreamText, false);
+                  }
+                }
+              } catch (e) { }
+            }
+          }
+        }
+      }
+
+      updateStreamingAIBubbleText(activeSpeechStreamText, true);
+    }
+
+    async function executeOpenAIStreamingAPI(userPrompt) {
+      const apiKey = config.apiKey;
+      if (!apiKey) {
+        throw new Error("Missing OpenAI API Key inside system configurations.");
+      }
+
+      const baseURL = config.endpoint || 'https://api.openai.com/v1';
+      const url = `${baseURL}/chat/completions`;
+
+      const systemMessage = "You are Dual Pulse a precise and direct AI assistant. Provide helpful, standard answers structured cleanly with markdown. Return pure text answers.";
+      const messages = getContextHistoryPayload(systemMessage);
+      messages.push({ role: 'user', content: userPrompt });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: config.model || 'gpt-4o-mini',
+          messages: messages,
+          stream: true
+        })
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json().catch(() => ({}));
+        throw new Error(errorJson?.error?.message || `HTTP Code ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let finished = false;
+      let streamBuffer = '';
+
+      while (!finished) {
+        const { value, done } = await reader.read();
+        finished = done;
+        if (value) {
+          streamBuffer += decoder.decode(value);
+          const lines = streamBuffer.split('\n');
+          streamBuffer = lines.pop();
+
+          for (const line of lines) {
+            const cleanLine = line.trim();
+            if (cleanLine === 'data: [DONE]') {
+              finished = true;
+              break;
+            }
+            if (cleanLine.startsWith('data: ')) {
+              try {
+                const parsed = JSON.parse(cleanLine.substring(6));
+                const choice = parsed.choices ? parsed.choices[0] : null;
+                if (choice) {
+                  const content = choice.delta?.content || '';
+                  if (content) {
+                    activeSpeechStreamText += content;
+                    updateStreamingAIBubbleText(activeSpeechStreamText, false);
+                  }
+                }
+              } catch (e) { }
+            }
+          }
+        }
+      }
+
+      updateStreamingAIBubbleText(activeSpeechStreamText, true);
+    }
+
+    async function executeGeminiStreamingAPI(userPrompt) {
+      const apiKey = config.apiKey;
+      if (!apiKey) {
+        throw new Error("Missing Google Gemini API Key inside configurations.");
+      }
+
+      const targetModel = config.model || 'gemini-2.5-flash';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:streamGenerateContent?key=${apiKey}`;
+
+      const contents = [];
+      const recentLogs = conversationLogs.slice(-10);
+      recentLogs.forEach(entry => {
+        contents.push({
+          role: entry.sender === 'User' ? 'user' : 'model',
+          parts: [{ text: entry.message }]
+        });
+      });
+      contents.push({ role: 'user', parts: [{ text: userPrompt }] });
+
+      const systemInstruction = {
+        parts: [{ text: "Provide helpful, direct answers structured with standard markdown. Do not include sci-fi tags, bracketed robotic status text, or decorative prefix lines." }]
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: contents,
+          systemInstruction: systemInstruction
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP Code ${response.status}: ${errorText}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let finished = false;
+      let jsonBuffer = '';
+
+      while (!finished) {
+        const { value, done } = await reader.read();
+        finished = done;
+        if (value) {
+          jsonBuffer += decoder.decode(value);
+          try {
+            const matches = [...jsonBuffer.matchAll(/"text":\s*"((?:[^"\\]|\\.)*)"/g)];
+            let parsedText = '';
+            matches.forEach(m => {
+              try {
+                parsedText += JSON.parse(`"${m[1]}"`);
+              } catch (err) { }
+            });
+
+            if (parsedText && parsedText !== activeSpeechStreamText) {
+              activeSpeechStreamText = parsedText;
+              updateStreamingAIBubbleText(activeSpeechStreamText, false);
+            }
+          } catch (e) { }
+        }
+      }
+
+      updateStreamingAIBubbleText(activeSpeechStreamText, true);
+    }
+
+    async function executeAnthropicStreamingAPI(userPrompt) {
+      const apiKey = config.apiKey;
+      if (!apiKey) {
+        throw new Error("Missing Anthropic API Key inside configurations.");
+      }
+
+      const baseURL = config.endpoint || 'https://api.anthropic.com/v1';
+      const url = `${baseURL}/messages`;
+
+      const systemMessage = "You are a helpful assistant. Keep responses highly concise and in markdown format.";
+
+      const messages = [];
+      const recentLogs = conversationLogs.slice(-10);
+      recentLogs.forEach(entry => {
+        messages.push({
+          role: entry.sender === 'User' ? 'user' : 'assistant',
+          content: entry.message
+        });
+      });
+      messages.push({ role: 'user', content: userPrompt });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: config.model || 'claude-3-5-sonnet-20241022',
+          system: systemMessage,
+          messages: messages,
+          max_tokens: 1024,
+          stream: true
+        })
+      });
+
+      if (!response.ok) {
+        const errVal = await response.text();
+        throw new Error(`HTTP Code ${response.status}: ${errVal}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let finished = false;
+      let streamBuffer = '';
+
+      while (!finished) {
+        const { value, done } = await reader.read();
+        finished = done;
+        if (value) {
+          streamBuffer += decoder.decode(value);
+          const lines = streamBuffer.split('\n');
+          streamBuffer = lines.pop();
+
+          for (const line of lines) {
+            const cleanLine = line.trim();
+            if (cleanLine.startsWith('data: ')) {
+              try {
+                const dataObj = JSON.parse(cleanLine.substring(6));
+                if (dataObj.type === 'content_block_delta' && dataObj.delta?.text) {
+                  activeSpeechStreamText += dataObj.delta.text;
+                  updateStreamingAIBubbleText(activeSpeechStreamText, false);
+                }
+              } catch (e) { }
+            }
+          }
+        }
+      }
+
+      updateStreamingAIBubbleText(activeSpeechStreamText, true);
+    }
+
+    // ----------------------------------------------------
+    // BARGE-IN & USER INTERRUPT IMPLEMENTATIONS (Feature A)
+    // ----------------------------------------------------
+
+    function setupEventListeners() {
+      document.getElementById('btn-send').addEventListener('click', submitMessage);
+
+      document.getElementById('prompt-input').addEventListener('keydown', (e) => {
+        if (isSpeaking) {
+          cancelSpeech();
+        }
+        if (e.key === 'Enter' && e.ctrlKey) {
+          e.preventDefault();
+          submitMessage();
+        }
+      });
+
+      document.getElementById('prompt-input').addEventListener('input', (e) => {
+        adjustTextareaHeight(e.target);
+        if (isSpeaking) {
+          cancelSpeech();
+        }
+      });
+
+      document.getElementById('prompt-input').addEventListener('focus', () => {
+        if (isSpeaking) {
+          cancelSpeech();
+        }
+      });
+
+      document.getElementById('btn-mic').addEventListener('click', (e) => {
+        if (isSpeaking) {
+          cancelSpeech();
+        }
+        toggleMicrophone();
+      });
+
+      document.getElementById('btn-settings').addEventListener('click', () => toggleSettingsModal(true));
+      document.getElementById('btn-close-settings').addEventListener('click', () => toggleSettingsModal(false));
+      document.getElementById('modal-overlay').addEventListener('click', () => toggleSettingsModal(false));
+
+      document.getElementById('btn-save-settings').addEventListener('click', saveSettings);
+      document.getElementById('btn-reset-settings').addEventListener('click', () => {
+        if (confirm("Reset config options back to system default settings?")) {
+          localStorage.removeItem('aether_agent_settings');
+          loadSettings();
+          showToast("Reset defaults applied.");
+          toggleSettingsModal(false);
+        }
+      });
+
+      document.getElementById('btn-export').addEventListener('click', exportConversationTranscript);
+      document.getElementById('btn-close-links').addEventListener('click', closeLinksModal);
+      document.getElementById('links-overlay').addEventListener('click', closeLinksModal);
+      document.getElementById('config-provider').addEventListener('change', updateSettingsFormUI);
+
+      document.getElementById('btn-toggle-key-vis').addEventListener('click', () => {
+        const keyInput = document.getElementById('config-key');
+        const eyeIcon = document.getElementById('btn-toggle-key-vis').firstElementChild;
+
+        if (keyInput.type === 'password') {
+          keyInput.type = 'text';
+          eyeIcon.setAttribute('data-lucide', 'eye-off');
+        } else {
+          keyInput.type = 'password';
+          eyeIcon.setAttribute('data-lucide', 'eye');
+        }
+        lucide.createIcons();
+      });
+
+      document.getElementById('config-rate').addEventListener('input', (e) => {
+        document.getElementById('rate-val').innerText = parseFloat(e.target.value).toFixed(1) + 'x';
+      });
+      document.getElementById('config-pitch').addEventListener('input', (e) => {
+        document.getElementById('pitch-val').innerText = parseFloat(e.target.value).toFixed(1);
+      });
+    }
+  </script>
+</body>
+
+</html>
